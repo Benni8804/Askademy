@@ -1,0 +1,188 @@
+package com.eduhub.controller;
+
+import com.eduhub.dto.AnswerRequest;
+import com.eduhub.model.Answer;
+import com.eduhub.model.Question;
+import com.eduhub.model.User;
+import com.eduhub.repository.AnswerRepository;
+import com.eduhub.repository.QuestionRepository;
+import com.eduhub.repository.UserRepository;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@RestController
+@RequestMapping("/api/answers")
+public class AnswerController {
+
+    /**
+     * Request DTO for batch answering multiple questions at once.
+     * Used by professors to answer grouped similar questions efficiently.
+     */
+    public static class BatchAnswerRequest {
+        private List<Long> questionIds;
+        private String content;
+        private boolean autoVerify;
+        private boolean anonymous;
+
+        public List<Long> getQuestionIds() { return questionIds; }
+        public void setQuestionIds(List<Long> questionIds) { this.questionIds = questionIds; }
+        public String getContent() { return content; }
+        public void setContent(String content) { this.content = content; }
+        public boolean isAutoVerify() { return autoVerify; }
+        public void setAutoVerify(boolean autoVerify) { this.autoVerify = autoVerify; }
+        public boolean isAnonymous() { return anonymous; }
+        public void setAnonymous(boolean anonymous) { this.anonymous = anonymous; }
+    }
+
+    private final AnswerRepository answerRepository;
+    private final QuestionRepository questionRepository;
+    private final UserRepository userRepository;
+
+    public AnswerController(AnswerRepository answerRepository,
+                           QuestionRepository questionRepository,
+                           UserRepository userRepository) {
+        this.answerRepository = answerRepository;
+        this.questionRepository = questionRepository;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping("/question/{questionId}")
+    @PreAuthorize("hasAnyRole('PROFESSOR', 'STUDENT')")
+    public ResponseEntity<List<Answer>> getAnswersByQuestion(@PathVariable Long questionId) {
+        List<Answer> answers = answerRepository.findByQuestionIdOrderByVerifiedDescCreatedAtAsc(questionId);
+        return ResponseEntity.ok(answers);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyRole('PROFESSOR', 'STUDENT')")
+    public ResponseEntity<Answer> createAnswer(
+            @Valid @RequestBody AnswerRequest request,
+            @AuthenticationPrincipal User user) {
+        
+        Question question = questionRepository.findById(Objects.requireNonNull(request.getQuestionId()))
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        
+        User author = userRepository.findById(Objects.requireNonNull(user.getId()))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        Answer answer = new Answer(request.getContent(), author, question);
+        answer.setAnonymous(request.isAnonymous());
+        return ResponseEntity.ok(answerRepository.save(answer));
+    }
+
+    /**
+     * POST /api/answers/batch
+     * Creates the same answer for multiple questions at once.
+     * Used by professors to efficiently answer grouped similar questions.
+     * 
+     * @param request BatchAnswerRequest containing questionIds, content, autoVerify, anonymous
+     * @param user The authenticated professor
+     * @return List of created answers
+     */
+    @PostMapping("/batch")
+    @PreAuthorize("hasRole('PROFESSOR')")
+    public ResponseEntity<List<Answer>> createBatchAnswers(
+            @RequestBody BatchAnswerRequest request,
+            @AuthenticationPrincipal User user) {
+        
+        if (request.getQuestionIds() == null || request.getQuestionIds().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        if (request.getContent() == null || request.getContent().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        User author = userRepository.findById(Objects.requireNonNull(user.getId()))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        List<Answer> createdAnswers = new ArrayList<>();
+        
+        for (Long questionId : request.getQuestionIds()) {
+            Question question = questionRepository.findById(questionId)
+                    .orElse(null);
+            
+            if (question == null) {
+                continue; // Skip invalid question IDs
+            }
+            
+            // Verify professor teaches this course
+            if (!question.getCourse().getProfessor().getId().equals(user.getId())) {
+                continue; // Skip questions from courses the professor doesn't teach
+            }
+            
+            Answer answer = new Answer(request.getContent(), author, question);
+            answer.setAnonymous(request.isAnonymous());
+            
+            // Auto-verify if requested (professor's own answer)
+            if (request.isAutoVerify()) {
+                answer.setVerified(true);
+            }
+            
+            createdAnswers.add(answerRepository.save(answer));
+        }
+        
+        return ResponseEntity.ok(createdAnswers);
+    }
+
+    @PutMapping("/{id}/verify")
+    @PreAuthorize("hasRole('PROFESSOR')")
+    public ResponseEntity<Answer> verifyAnswer(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        
+        Answer answer = answerRepository.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> new RuntimeException("Answer not found"));
+        
+        // Verify the professor teaches this course
+        Question question = answer.getQuestion();
+        if (!question.getCourse().getProfessor().getId().equals(user.getId())) {
+            return ResponseEntity.status(403).build();
+        }
+        
+        answer.setVerified(!answer.isVerified());
+        return ResponseEntity.ok(answerRepository.save(answer));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('PROFESSOR', 'STUDENT', 'ADMIN')")
+    @org.springframework.transaction.annotation.Transactional
+    public ResponseEntity<Void> deleteAnswer(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        
+        System.out.println("DEBUG: Request to delete answer " + id + " by user " + user.getEmail());
+
+        Answer answer = answerRepository.findById(Objects.requireNonNull(id))
+                .orElseThrow(() -> new RuntimeException("Answer not found"));
+        
+        // Permission check: Author OR Course Professor OR Admin
+        boolean isAuthor = answer.getAuthor().getId().equals(user.getId());
+        boolean isAdmin = user.getRole().name().equals("ADMIN");
+        boolean isCourseProfessor = answer.getQuestion().getCourse().getProfessor().getId().equals(user.getId());
+
+        if (!isAuthor && !isCourseProfessor && !isAdmin) {
+            System.out.println("DEBUG: Unauthorized delete attempt");
+            return ResponseEntity.status(403).build();
+        }
+        
+        // Prevent resurrection by CascadeType.ALL/MERGE from parent Question
+        Question question = answer.getQuestion();
+        if (question != null) {
+            question.getAnswers().removeIf(a -> a.getId().equals(id));
+            // We don't save question explicitly, but if it's managed, this updates the collection
+        }
+
+        answerRepository.delete(answer);
+        answerRepository.flush(); // Force commit
+        System.out.println("DEBUG: Answer " + id + " deleted successfully");
+        return ResponseEntity.ok().build();
+    }
+}

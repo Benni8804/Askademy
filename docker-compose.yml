@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: askademy-postgres
+    environment:
+      POSTGRES_DB: askademy
+      POSTGRES_USER: askademy_user
+      POSTGRES_PASSWORD: askademy_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - askademy_postgres_data:/var/lib/postgresql/data
+    networks:
+      - askademy-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: askademy-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/askademy
+      SPRING_DATASOURCE_USERNAME: askademy_user
+      SPRING_DATASOURCE_PASSWORD: askademy_password
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - askademy-network
+
+volumes:
+  askademy_postgres_data:
+
+networks:
+  askademy-network:
+    driver: bridge
