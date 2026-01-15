@@ -2,6 +2,7 @@ package com.eduhub.service;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class CourseService {
     }
 
     public Optional<Course> getCourseById(Integer id) {
-        return courseRepository.findById(id);
+        return courseRepository.findById(Objects.requireNonNull(id));
     }
 
     public List<Course> getCoursesByProfessor(Integer professorId) {
@@ -57,7 +58,7 @@ public class CourseService {
     }
 
     public List<Course> getCoursesByStudent(Integer studentId) {
-        User student = userRepository.findById(studentId)
+        User student = userRepository.findById(Objects.requireNonNull(studentId))
                 .orElseThrow(() -> new UnauthorizedActionException("Student not found"));
         return courseRepository.findAll().stream()
                 .filter(course -> course.getStudents().contains(student))
@@ -65,11 +66,11 @@ public class CourseService {
     }
 
     public void enrollStudent(Integer courseId, Integer studentId) {
-        Optional<Course> courseOpt = courseRepository.findById(courseId);
+        Optional<Course> courseOpt = courseRepository.findById(Objects.requireNonNull(courseId));
         if (courseOpt.isEmpty()) {
             throw new CourseNotFoundException("Course not found");
         }
-        Optional<User> studentOpt = userRepository.findById(studentId);
+        Optional<User> studentOpt = userRepository.findById(Objects.requireNonNull(studentId));
         if (studentOpt.isEmpty()) {
             throw new UnauthorizedActionException("Student not found");
         }
@@ -87,7 +88,7 @@ public class CourseService {
         if (courseOpt.isEmpty()) {
             throw new CourseNotFoundException("Invalid course code");
         }
-        Optional<User> studentOpt = userRepository.findById(studentId);
+        Optional<User> studentOpt = userRepository.findById(Objects.requireNonNull(studentId));
         if (studentOpt.isEmpty()) {
             throw new UnauthorizedActionException("Student not found");
         }
@@ -105,16 +106,16 @@ public class CourseService {
      * Related questions, answers, and announcements are deleted via cascade.
      */
     public void deleteCourse(Integer courseId, User currentUser) {
-        Course course = courseRepository.findById(courseId)
+        Course course = courseRepository.findById(Objects.requireNonNull(courseId))
                 .orElseThrow(() -> new CourseNotFoundException("Course not found"));
-        
+
         boolean isOwner = course.getProfessor().getId().equals(currentUser.getId());
         boolean isAdmin = "ADMIN".equals(currentUser.getRole().name());
-        
+
         if (!isOwner && !isAdmin) {
             throw new UnauthorizedActionException("Only course owner or admin can delete this course");
         }
-        
+
         courseRepository.delete(course);
     }
 }

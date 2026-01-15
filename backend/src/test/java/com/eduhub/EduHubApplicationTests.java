@@ -1,5 +1,23 @@
 package com.eduhub;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.eduhub.dto.RegisterRequest;
 import com.eduhub.model.Course;
 import com.eduhub.model.Role;
@@ -7,19 +25,6 @@ import com.eduhub.model.User;
 import com.eduhub.repository.UserRepository;
 import com.eduhub.security.JwtUtil;
 import com.eduhub.service.UserService;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit Tests for EduHub Application
@@ -42,7 +47,7 @@ class EduHubApplicationTests {
     private UserService userService;
 
     // ============================================================================
-    // CONSTRUCTOR TESTS (1 point)
+    // CONSTRUCTOR TESTS 
     // ============================================================================
 
     /**
@@ -96,7 +101,7 @@ class EduHubApplicationTests {
     }
 
     // ============================================================================
-    // FUNCTIONALITY TESTS (1 point)
+    // FUNCTIONALITY TESTS 
     // ============================================================================
 
     /**

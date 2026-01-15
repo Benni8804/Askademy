@@ -17,8 +17,8 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Askademy Backend</name>
-    <description>Spring Boot backend for Askademy Learning Platform</description>
+    <name>Askademic Backend</name>
+    <description>Spring Boot backend for Askademic Learning Platform</description>
 
     <properties>
         <java.version>17</java.version>
@@ -42,12 +42,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-        
-        <!-- WebSocket for real-time updates -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
         <!-- Database -->

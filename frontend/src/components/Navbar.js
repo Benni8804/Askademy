@@ -161,7 +161,7 @@ const Navbar = () => {
             <div className={`p-2 rounded-lg border-2 border-slate-900 group-hover:-translate-y-1 transition-transform ${darkMode ? 'bg-indigo-500 text-white' : 'bg-slate-900 text-white'}`}>
               <GraduationCap className="w-8 h-8" />
             </div>
-            <span className={`text-2xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Askademy</span>
+            <span className={`text-2xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>Askademic</span>
           </Link>
 
           {/* Center Navigation - Solid Pill */}

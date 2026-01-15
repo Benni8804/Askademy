@@ -80,7 +80,7 @@ const Register = () => {
             </div>
             <h2 className="text-4xl font-black text-slate-900 uppercase">Create Account</h2>
             <p className="mt-2 text-sm font-bold text-slate-900">
-              Join Askademy today
+              Join Askademic today
             </p>
           </div>
 

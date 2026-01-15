@@ -1,5 +1,16 @@
 package com.eduhub.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.eduhub.dto.AuthResponse;
 import com.eduhub.dto.LoginRequest;
 import com.eduhub.dto.RegisterRequest;
@@ -7,14 +18,8 @@ import com.eduhub.model.Role;
 import com.eduhub.model.User;
 import com.eduhub.security.JwtUtil;
 import com.eduhub.service.UserService;
+
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,7 +50,7 @@ public class AuthController {
 
             System.out.println(">>> LOGIN SUCCESSFUL for: " + user.getEmail());
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (org.springframework.security.core.AuthenticationException e) {
             System.err.println(">>> LOGIN ERROR: " + e.getMessage());
             return ResponseEntity.status(401).body("Invalid email or password");
         }
@@ -73,9 +78,11 @@ public class AuthController {
 
             System.out.println(">>> REGISTRATION SUCCESSFUL for: " + user.getEmail());
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
+            System.err.println(">>> REGISTRATION ERROR: Invalid role - " + e.getMessage());
+            return ResponseEntity.badRequest().body("Registration failed: Invalid role");
+        } catch (RuntimeException e) {
             System.err.println(">>> REGISTRATION ERROR: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
         }
     }

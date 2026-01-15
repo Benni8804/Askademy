@@ -1,7 +1,7 @@
 -- ============================================================================
--- ASKADEMY DATABASE SCHEMA FOR ORACLE APEX
+-- ASKADEMIC DATABASE SCHEMA FOR ORACLE APEX
 -- ============================================================================
--- Project: Askademy (The Student Hub)
+-- Project: Askademic (The Student Hub)
 -- Purpose: Database class final project submission
 -- Contains: 5 Tables, Constraints, Views, Sample CRUD operations
 -- ============================================================================

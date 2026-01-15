@@ -59,7 +59,7 @@ const Login = () => {
             </div>
             <h2 className="text-4xl font-black text-slate-900 uppercase">Welcome Back</h2>
             <p className="mt-2 text-sm font-bold text-slate-900">
-              Sign in to your Askademy account
+              Sign in to your Askademic account
             </p>
           </div>
 

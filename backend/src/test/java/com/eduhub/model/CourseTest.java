@@ -11,6 +11,7 @@ class CourseTest {
     private User professor;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         professor = new User(1, "Prof", "Smith", "prof@example.com", "pass", Role.PROFESSOR);
     }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -18,7 +19,7 @@ public class AnnouncementService {
     private AnnouncementDataExporter exporter;
 
     public Announcement createAnnouncement(Announcement announcement) {
-        return announcementRepository.save(announcement);
+        return announcementRepository.save(Objects.requireNonNull(announcement));
     }
 
     public List<Announcement> getAnnouncementsByCourseId(Integer courseId) {
@@ -26,7 +27,7 @@ public class AnnouncementService {
     }
 
     public Optional<Announcement> getAnnouncementById(Long id) {
-        return announcementRepository.findById(id);
+        return announcementRepository.findById(Objects.requireNonNull(id));
     }
 
     public void exportAnnouncementsToJson(String filePath) throws Exception {
@@ -35,6 +36,6 @@ public class AnnouncementService {
     }
 
     public void deleteAnnouncement(Long id) {
-        announcementRepository.deleteById(id);
+        announcementRepository.deleteById(Objects.requireNonNull(id));
     }
 }

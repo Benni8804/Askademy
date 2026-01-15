@@ -13,6 +13,7 @@ class AnswerTest {
     private User student;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         User professor = new User(1, "Prof", "Smith", "prof@example.com", "pass", Role.PROFESSOR);
         Course course = new Course("Programming 3", "Java course", professor);

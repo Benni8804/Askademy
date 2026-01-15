@@ -1,4 +1,4 @@
-# 🎓 Askademy - Learning Management Platform
+# 🎓 Askademic - Learning Management Platform
 
 > A modern, full-stack learning management system featuring real-time Q&A, AI-powered question grouping, course management, and role-based access control.
 

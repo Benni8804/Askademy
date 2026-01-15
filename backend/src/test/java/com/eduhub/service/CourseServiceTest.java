@@ -26,6 +26,7 @@ import com.eduhub.repository.CourseRepository;
 import com.eduhub.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("null")
 class CourseServiceTest {
 
     @Mock
@@ -42,6 +43,7 @@ class CourseServiceTest {
     private Course course;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         professor = new User(1, "Prof", "Smith", "prof@example.com", "pass", Role.PROFESSOR);
         student = new User(2, "John", "Doe", "student@example.com", "pass", Role.STUDENT);

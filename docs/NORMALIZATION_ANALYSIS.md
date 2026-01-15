@@ -1,14 +1,14 @@
 # Database Normalization Analysis
-## Askademy (The Student Hub) - Database Design
+## Askademic (The Student Hub) - Database Design
 
-**Project:** Askademy - Academic Q&A Platform  
+**Project:** Askademic - Academic Q&A Platform  
 **Date:** December 2024
 
 ---
 
 ## 1. Database Schema Overview
 
-The Askademy database consists of **6 relations** (tables):
+The Askademic database consists of **6 relations** (tables):
 
 | Table | Purpose | Primary Key |
 |-------|---------|-------------|
@@ -154,7 +154,7 @@ id → content, verified, created_at, author_id, question_id
 
 ## 5. Conclusion
 
-The Askademy database schema is in **Third Normal Form (3NF)** because:
+The Askademic database schema is in **Third Normal Form (3NF)** because:
 
 1. **1NF:** All attributes are atomic, no repeating groups
 2. **2NF:** No partial dependencies on composite keys

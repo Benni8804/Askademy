@@ -26,14 +26,17 @@ public class VectorType implements UserType<List<Double>> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Class<List<Double>> returnedClass() {
         return (Class<List<Double>>) (Class<?>) List.class;
     }
 
     @Override
     public boolean equals(List<Double> x, List<Double> y) {
-        if (x == y) return true;
-        if (x == null || y == null) return false;
+        if (x == y)
+            return true;
+        if (x == null || y == null)
+            return false;
         return x.equals(y);
     }
 
@@ -43,9 +46,9 @@ public class VectorType implements UserType<List<Double>> {
     }
 
     @Override
-    public List<Double> nullSafeGet(ResultSet rs, int position, 
-                                     SharedSessionContractImplementor session, 
-                                     Object owner) throws SQLException {
+    public List<Double> nullSafeGet(ResultSet rs, int position,
+            SharedSessionContractImplementor session,
+            Object owner) throws SQLException {
         String value = rs.getString(position);
         if (value == null) {
             return null;
@@ -54,9 +57,9 @@ public class VectorType implements UserType<List<Double>> {
     }
 
     @Override
-    public void nullSafeSet(PreparedStatement st, List<Double> value, 
-                           int index, SharedSessionContractImplementor session) 
-                           throws SQLException {
+    public void nullSafeSet(PreparedStatement st, List<Double> value,
+            int index, SharedSessionContractImplementor session)
+            throws SQLException {
         if (value == null) {
             st.setNull(index, Types.OTHER);
         } else {
@@ -81,6 +84,7 @@ public class VectorType implements UserType<List<Double>> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Double> assemble(Serializable cached, Object owner) {
         return deepCopy((List<Double>) cached);
     }
@@ -91,11 +95,11 @@ public class VectorType implements UserType<List<Double>> {
     private List<Double> parseVector(String vectorString) {
         List<Double> result = new ArrayList<>();
         String cleaned = vectorString.replace("[", "").replace("]", "").trim();
-        
+
         if (cleaned.isEmpty()) {
             return result;
         }
-        
+
         String[] parts = cleaned.split(",");
         for (String part : parts) {
             result.add(Double.parseDouble(part.trim()));
