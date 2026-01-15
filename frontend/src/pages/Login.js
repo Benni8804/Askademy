@@ -37,11 +37,9 @@ const Login = () => {
     }
 
     const result = await login(email, password);
-    console.log('Login result:', result);
     if (result.success) {
       navigate('/dashboard');
     } else {
-      console.log('Setting error:', result.message);
       setError(result.message || 'Unable to sign in. Please check your credentials and try again.');
     }
     setLoading(false);

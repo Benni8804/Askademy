@@ -1,5 +1,21 @@
 package com.eduhub.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.eduhub.dto.AnswerRequest;
 import com.eduhub.model.Answer;
 import com.eduhub.model.Question;
@@ -7,15 +23,8 @@ import com.eduhub.model.User;
 import com.eduhub.repository.AnswerRepository;
 import com.eduhub.repository.QuestionRepository;
 import com.eduhub.repository.UserRepository;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/answers")
@@ -184,8 +193,6 @@ public class AnswerController {
             @PathVariable Long id,
             @AuthenticationPrincipal User user) {
 
-        System.out.println("DEBUG: Request to delete answer " + id + " by user " + user.getEmail());
-
         Answer answer = answerRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Answer not found"));
 
@@ -195,7 +202,6 @@ public class AnswerController {
         boolean isCourseProfessor = answer.getQuestion().getCourse().getProfessor().getId().equals(user.getId());
 
         if (!isAuthor && !isCourseProfessor && !isAdmin) {
-            System.out.println("DEBUG: Unauthorized delete attempt");
             return ResponseEntity.status(403).build();
         }
 
@@ -208,8 +214,7 @@ public class AnswerController {
         }
 
         answerRepository.delete(answer);
-        answerRepository.flush(); // Force commit
-        System.out.println("DEBUG: Answer " + id + " deleted successfully");
+        answerRepository.flush();
         return ResponseEntity.ok().build();
     }
 }

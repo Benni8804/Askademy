@@ -41,9 +41,6 @@ public class NotificationServiceImpl implements NotificationService {
                 user.getEmail(),
                 user.getFirstname() + " " + user.getLastname(),
                 message);
-
-        // Future: Implement actual email/notification sending logic
-        // Example: emailService.sendEmail(user.getEmail(), "Notification", message);
     }
 
     @Override

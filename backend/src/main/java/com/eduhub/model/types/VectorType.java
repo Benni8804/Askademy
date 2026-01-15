@@ -102,7 +102,7 @@ public class VectorType implements UserType<List<Double>> {
 
         String[] parts = cleaned.split(",");
         for (String part : parts) {
-            result.add(Double.parseDouble(part.trim()));
+            result.add(Double.valueOf(part.trim()));
         }
         return result;
     }

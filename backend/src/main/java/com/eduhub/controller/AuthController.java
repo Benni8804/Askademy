@@ -37,8 +37,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
-            System.out.println(">>> LOGIN REQUEST RECEIVED: " + request.getEmail());
-            
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
@@ -47,8 +45,6 @@ public class AuthController {
             User user = userService.findByEmail(request.getEmail()).orElseThrow();
             String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), user.getId());
             AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(), user.getRole().name());
-
-            System.out.println(">>> LOGIN SUCCESSFUL for: " + user.getEmail());
             return ResponseEntity.ok(response);
         } catch (org.springframework.security.core.AuthenticationException e) {
             System.err.println(">>> LOGIN ERROR: " + e.getMessage());
@@ -59,8 +55,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            System.out.println(">>> REGISTER REQUEST RECEIVED: " + request.getEmail() + " - " + request.getRole());
-            
             if (userService.existsByEmail(request.getEmail())) {
                 return ResponseEntity.badRequest().body("Email already exists");
             }
@@ -75,8 +69,6 @@ public class AuthController {
             user = userService.registerUser(user);
             String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), user.getId());
             AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(), user.getRole().name());
-
-            System.out.println(">>> REGISTRATION SUCCESSFUL for: " + user.getEmail());
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             System.err.println(">>> REGISTRATION ERROR: Invalid role - " + e.getMessage());

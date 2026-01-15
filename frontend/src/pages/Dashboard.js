@@ -136,8 +136,6 @@ const Dashboard = () => {
       navigate(`/courses/${courseId}`);
     } catch (error) {
       console.error('Failed to enroll', error);
-      // const errorMessage = parseErrorMessage(error); // Removed as createCourseError is removed
-      // setCreateCourseError(errorMessage); // Removed as createCourseError is removed
     }
   };
 
